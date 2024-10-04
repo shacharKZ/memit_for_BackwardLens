@@ -109,9 +109,9 @@ def execute_ft(
         for txt, tgt in zip(
             chunks(texts, hparams.batch_size), chunks(targets, hparams.batch_size)
         ):
-            inputs = tok(txt, return_tensors="pt", padding=True).to("cuda")
+            inputs = tok(txt, return_tensors="pt", padding=True).to(model.device)
             target_ids = tok(tgt, return_tensors="pt", padding=True)["input_ids"].to(
-                "cuda"
+                model.device
             )
             last_token_inds = inputs["attention_mask"].sum(dim=1) - 1
             loss_mask = target_ids != tok.unk_token_id

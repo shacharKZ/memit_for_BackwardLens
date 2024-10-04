@@ -1,0 +1,12 @@
+{
+    "algo_version": 1,
+    "layers": [
+        35
+    ],
+    "num_steps": 1,
+    "lr": 0.24,
+    "mlp_module_ff2": "transformer.h.{}.mlp.c_proj",
+    
+    "stop_on_success": 0,
+    "annotate": 0
+   }

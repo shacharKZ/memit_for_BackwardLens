@@ -1,3 +1,9 @@
+# MEMIT + Forward Pass Shift
+
+This repo is a fork of MEMIT [(Offical Repo)](https://github.com/kmeng01/memit) that includes the implementation of **Forward Pass Shift** from BackwardLens [(Offical Repo)](https://github.com/shacharKZ/BackwardLens)
+
+Follow MEMIT instructions to run the experiments and see down below instruction regarding Forward Pass Shift
+
 # MEMIT: Mass-Editing Memory in a Transformer
 
 Editing thousands of facts into a transformer memory at once.
@@ -78,7 +84,19 @@ python3 -m experiments.summarize --dir_name=MEMIT --runs=run_<run1>,run_<run2>
 
 Running `python3 -m experiments.evaluate -h` or `python3 -m experiments.summarize -h` provides details about command-line flags.
 
+
+## Forward Pass Shift
+
+To produce experiments that include Forward Pass Shift, run:
+
+```bash
+scripts_v2/run_basic_exp_eval.sh 1 cf 1000
+```
+
+
 ## How to Cite
+
+First and foremost, we thank the authors of the MEMIT paper. Please cite them:
 
 ```bibtex
 @article{meng2022memit,
@@ -86,5 +104,17 @@ Running `python3 -m experiments.evaluate -h` or `python3 -m experiments.summariz
   author={Kevin Meng and Sen Sharma, Arnab and Alex Andonian and Yonatan Belinkov and David Bau},
   journal={arXiv preprint arXiv:2210.07229},
   year={2022}
+}
+```
+
+
+If you used Foward Pass Shift, please also cite BackwardLens paper with:
+
+```bibtex
+@article{katz2024backward,
+  title={Backward lens: Projecting language model gradients into the vocabulary space},
+  author={Katz, Shahar and Belinkov, Yonatan and Geva, Mor and Wolf, Lior},
+  journal={arXiv preprint arXiv:2402.12865},
+  year={2024}
 }
 ```

@@ -9,6 +9,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from baselines.ft import FTHyperParams, apply_ft_to_model
 from baselines.mend import MENDHyperParams, MendRewriteExecutor
+from baselines.naive import DummyParams, apply_nothing_to_model
+from new_methods.forward_shift import ForwardShiftHyperParams, apply_forward_pass_shit_to_model
+
 from dsets import (
     AttributeSnippets,
     CounterFactDataset,
@@ -24,10 +27,13 @@ from util import nethook
 from util.globals import *
 
 ALG_DICT = {
+    "DUMMY": (DummyParams, apply_nothing_to_model), # test the original model. does not apply any change to the original model
     "MEMIT": (MEMITHyperParams, apply_memit_to_model),
     "ROME": (ROMEHyperParams, apply_rome_to_model),
     "FT": (FTHyperParams, apply_ft_to_model),
     "MEND": (MENDHyperParams, MendRewriteExecutor().apply_to_model),
+    "SHIFT": (ForwardShiftHyperParams, apply_forward_pass_shit_to_model), # forward pass shift
+
 }
 
 DS_DICT = {
@@ -36,6 +42,7 @@ DS_DICT = {
     "zsre": (MENDQADataset, compute_rewrite_quality_zsre),
 }
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def main(
     alg_name: str,
@@ -90,7 +97,8 @@ def main(
     # Instantiate vanilla model
     if type(model_name) is str:
         print("Instantiating model")
-        model = AutoModelForCausalLM.from_pretrained(model_name).cuda()
+        model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+        print(f'Model {model_name} loaded successfully to {model.device} (cuda availability: {torch.cuda.is_available()})')
         tok = AutoTokenizer.from_pretrained(model_name)
         tok.pad_token = tok.eos_token
     else:
@@ -193,7 +201,7 @@ def main(
         # Restore original weights
         with torch.no_grad():
             for k, v in weights_copy.items():
-                nethook.get_parameter(model, k)[...] = v.to("cuda")
+                nethook.get_parameter(model, k)[...] = v.to(device)
 
         print("Evaluation took", time() - start)
 
@@ -222,8 +230,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--alg_name",
-        choices=["MEMIT", "ROME", "FT", "MEND"],
-        default="ROME",
+        choices=["DUMMY", "MEMIT", "ROME", "FT", "MEND", "SHIFT"],
+        default="SHIFT",
         help="Editing algorithm to use. Results are saved in results/<alg_name>/<run_id>, "
         "where a new run_id is generated on each run. "
         "If continuing from previous run, specify the run_id in --continue_from_run.",
